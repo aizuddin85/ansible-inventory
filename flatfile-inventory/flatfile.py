@@ -13,25 +13,47 @@ Refer http://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html
 import re
 import json
 
-fd = open('/var/lib/awx/job_status/testhost.txt', 'r')
-content = fd.readlines()
-fd.close()
+FILENAME = '/var/lib/awx/job_status/testhost.txt'
 
+"""
+Read the FILENAME into memory.
+"""
+try:
+    fd = open(FILENAME, 'r')
+    content = fd.readlines()
+    fd.close()
+except IOError as err:
+    raise err
+
+"""
+Initialized empty list for usage later.
+"""
 raw_host = []
 group_list = []
 
+"""
+Read the fd content and populate into the raw_host list.
+"""
 for unfilt_host in content:
     raw_host.append(unfilt_host.strip())
 
+"""
+Process the raw_host and look for first field for group name. Populate the group_list.
+"""
 for item in raw_host:
     x = item.split("-")[0]
     if x not in group_list:
         group_list.append(x)
-
+"""
+Initialized dictionary that start with empty _meta and its child hostvars.
+"""
 jsondict = {'_meta': {}}
-
 jsondict['_meta']['hostvars'] = {}
 
+"""
+Process host based on its group and produce json dump output that AWX inventory '--list' command
+expected.
+"""
 for group in group_list:
     group_host = []
     for host in raw_host:
