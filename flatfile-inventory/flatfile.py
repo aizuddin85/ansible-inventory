@@ -18,24 +18,24 @@ content = fd.readlines()
 fd.close()
 
 raw_host = []
-site_list = []
+group_list = []
 
 for unfilt_host in content:
     raw_host.append(unfilt_host.strip())
 
 for item in raw_host:
     x = item.split("-")[0]
-    if x not in site_list:
-        site_list.append(x)
+    if x not in group_list:
+        group_list.append(x)
 
 jsondict = {'_meta': {}}
 
 jsondict['_meta']['hostvars'] = {}
 
-for site in site_list:
-    site_host = []
+for group in group_list:
+    group_host = []
     for host in raw_host:
-        if re.search(host.split("-")[0], site, re.IGNORECASE):
-            site_host.append(host)
-    jsondict[site] = site_host
+        if re.search(host.split("-")[0], group, re.IGNORECASE):
+            group_host.append(host)
+    jsondict[group] = group_host
 print(json.dumps(jsondict, sort_keys=True, indent=2))
